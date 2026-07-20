@@ -71,10 +71,12 @@ its Environment Variables UI and routes the domain to the proxy service.
    ALLOWED_ORIGIN=https://mailbox-settings-premises.security.ait.dtu.dk
    ```
 
-   `API_AUDIENCE` is optional; when it is not set, the backend uses
-   `api://<CLIENT_ID>`. `REQUIRED_SCOPE` is optional and defaults to
-   `access_as_user`.
+   `API_AUDIENCE` is optional; when it is not set, the backend uses the
+   backend app registration's `<CLIENT_ID>`. Microsoft Entra v2 access tokens
+   for a scope such as `api://<CLIENT_ID>/access_as_user` commonly contain
+   that bare client ID in their `aud` claim. The backend also accepts the
+   equivalent `api://<CLIENT_ID>` Application ID URI for compatibility.
+   `REQUIRED_SCOPE` is optional and defaults to `access_as_user`.
 3. Save the configuration and deploy. Coolify's proxy terminates TLS and sends
    traffic to `proxy:80`; the internal nginx proxy forwards `/` to the
    frontend and `/api/` to the backend.
-

@@ -16,7 +16,19 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 const API_AUDIENCE =
   process.env.API_AUDIENCE ??
-  `api://${CLIENT_ID}`;
+  CLIENT_ID;
+
+/*
+ * Entra v2 access tokens commonly use the API application's client ID for
+ * their `aud` claim, even when the delegated scope is requested as
+ * `api://<client-id>/<scope>`. Accept the equivalent Application ID URI too,
+ * so existing deployments that set API_AUDIENCE to that URI continue to work.
+ */
+const acceptedAudiences = [
+  API_AUDIENCE,
+  CLIENT_ID,
+  `api://${CLIENT_ID}`,
+];
 
 const REQUIRED_SCOPE =
   process.env.REQUIRED_SCOPE ??
@@ -97,7 +109,7 @@ async function requireAuthentication(
       jwks,
       {
         issuer,
-        audience: API_AUDIENCE,
+        audience: acceptedAudiences,
         algorithms: ["RS256"],
       },
     );
@@ -308,7 +320,7 @@ app.listen(PORT, () => {
   );
 
   console.log(
-    `Expected audience: ${API_AUDIENCE}`,
+    `Accepted audiences: ${acceptedAudiences.join(", ")}`,
   );
 
   console.log(
