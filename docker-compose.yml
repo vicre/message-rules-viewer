@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: ./server
+    env_file:
+      - ./server/.env
+    environment:
+      PORT: 3001
+      # Requests from the browser are served by the frontend container.
+      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-http://localhost:8080}
+    expose:
+      - "3001"
+
+  frontend:
+    build:
+      context: ./client
+      args:
+        # The nginx configuration forwards this path to the backend service.
+        VITE_API_BASE_URL: /api
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
