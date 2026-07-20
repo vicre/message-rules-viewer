@@ -1,0 +1,33 @@
+# Use this file as the Docker Compose Location in Coolify.
+# Coolify supplies the variables referenced below from its Environment Variables UI.
+services:
+  backend:
+    build:
+      context: ./server
+    environment:
+      PORT: 3001
+      TENANT_ID: ${TENANT_ID}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN}
+      API_AUDIENCE: ${API_AUDIENCE:-api://${CLIENT_ID}}
+      REQUIRED_SCOPE: ${REQUIRED_SCOPE:-access_as_user}
+    expose:
+      - "3001"
+
+  frontend:
+    build:
+      context: ./client
+      args:
+        VITE_API_BASE_URL: /api
+    expose:
+      - "80"
+
+  proxy:
+    build:
+      context: ./proxy
+    depends_on:
+      - frontend
+      - backend
+    expose:
+      - "80"
