@@ -10,7 +10,7 @@ services:
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       ALLOWED_ORIGIN: ${ALLOWED_ORIGIN}
-      API_AUDIENCE: ${API_AUDIENCE:-api://${CLIENT_ID}}
+      API_AUDIENCE: ${API_AUDIENCE:-${CLIENT_ID}}
       REQUIRED_SCOPE: ${REQUIRED_SCOPE:-access_as_user}
     expose:
       - "3001"
