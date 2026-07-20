@@ -8,6 +8,10 @@
    cp server/.env.example server/.env
    ```
 
+   Set `ALLOWED_USER_PRINCIPAL_NAMES` to the comma-separated Entra user
+   principal names that may use the application. The provided example permits
+   `vicre@dtu.dk` and `kijens@dtu.dk`.
+
 2. Start the frontend and backend:
 
    ```sh
@@ -69,6 +73,7 @@ its Environment Variables UI and routes the domain to the proxy service.
    CLIENT_ID=<backend app registration client ID>
    CLIENT_SECRET=<backend app registration client secret>
    ALLOWED_ORIGIN=https://mailbox-settings-premises.security.ait.dtu.dk
+   ALLOWED_USER_PRINCIPAL_NAMES=vicre@dtu.dk,kijens@dtu.dk
    ```
 
    `API_AUDIENCE` is optional; when it is not set, the backend uses the
@@ -77,6 +82,10 @@ its Environment Variables UI and routes the domain to the proxy service.
    that bare client ID in their `aud` claim. The backend also accepts the
    equivalent `api://<CLIENT_ID>` Application ID URI for compatibility.
    `REQUIRED_SCOPE` is optional and defaults to `access_as_user`.
+   `ALLOWED_USER_PRINCIPAL_NAMES` is required and is a comma-separated list of
+   normalized Microsoft Entra user principal names. The backend checks this
+   allow-list after validating the access token, so it protects every API route
+   even if somebody bypasses the frontend.
 3. Save the configuration and deploy. Coolify's proxy terminates TLS and sends
    traffic to `proxy:80`; the internal nginx proxy forwards `/` to the
    frontend and `/api/` to the backend.
