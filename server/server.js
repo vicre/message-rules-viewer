@@ -38,10 +38,18 @@ const ALLOWED_ORIGIN =
   process.env.ALLOWED_ORIGIN ??
   "http://localhost:5173";
 
+const ALLOWED_USER_PRINCIPAL_NAMES = new Set(
+  (process.env.ALLOWED_USER_PRINCIPAL_NAMES ?? "")
+    .split(",")
+    .map((username) => username.trim().toLowerCase())
+    .filter(Boolean),
+);
+
 const requiredVariables = [
   "TENANT_ID",
   "CLIENT_ID",
   "CLIENT_SECRET",
+  "ALLOWED_USER_PRINCIPAL_NAMES",
 ];
 
 for (const variable of requiredVariables) {
@@ -50,6 +58,12 @@ for (const variable of requiredVariables) {
       `Missing required environment variable: ${variable}`,
     );
   }
+}
+
+if (ALLOWED_USER_PRINCIPAL_NAMES.size === 0) {
+  throw new Error(
+    "ALLOWED_USER_PRINCIPAL_NAMES must contain at least one username.",
+  );
 }
 
 app.use(
@@ -133,13 +147,26 @@ async function requireAuthentication(
       });
     }
 
+    const username =
+      payload.preferred_username ??
+      payload.upn ??
+      null;
+
+    if (
+      typeof username !== "string" ||
+      !ALLOWED_USER_PRINCIPAL_NAMES.has(
+        username.trim().toLowerCase(),
+      )
+    ) {
+      return response.status(403).json({
+        error: "Your account is not authorized to use this application.",
+      });
+    }
+
     request.auth = {
       objectId: payload.oid,
       tenantId: payload.tid,
-      username:
-        payload.preferred_username ??
-        payload.upn ??
-        null,
+      username,
       name: payload.name ?? null,
       scopes,
       claims: payload,
@@ -325,5 +352,9 @@ app.listen(PORT, () => {
 
   console.log(
     `Required scope: ${REQUIRED_SCOPE}`,
+  );
+
+  console.log(
+    `Authorized users: ${ALLOWED_USER_PRINCIPAL_NAMES.size}`,
   );
 });
