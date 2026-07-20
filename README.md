@@ -49,6 +49,7 @@ Configure the Traefik service target as `proxy:80` (or the proxy's published
 host port when Traefik runs outside this Compose network). Do not publish the
 `frontend` or `backend` service directly.
 
+
 ## Deploy with Coolify
 
 Use [`docker-compose.coolify.yml`](docker-compose.coolify.yml) as the **Docker
@@ -76,3 +77,4 @@ its Environment Variables UI and routes the domain to the proxy service.
 3. Save the configuration and deploy. Coolify's proxy terminates TLS and sends
    traffic to `proxy:80`; the internal nginx proxy forwards `/` to the
    frontend and `/api/` to the backend.
+

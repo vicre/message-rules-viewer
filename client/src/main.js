@@ -261,7 +261,7 @@ async function handleQuery(event) {
       await getBackendAccessToken();
 
     const endpoint =
-      `${API_BASE_URL}/api/message-rules` +
+      `${API_BASE_URL}/message-rules` +
       `?upn=${encodeURIComponent(upn)}`;
 
     const response = await fetch(endpoint, {
